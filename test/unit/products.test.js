@@ -119,3 +119,44 @@ describe("productController GetProductById", () => {
     expect(next).toBeCalledWith(errorMessage);
   });
 });
+
+describe("productController Update", () => {
+  it("should have a updateProduct function", () => {
+    expect(typeof productController.updateProduct).toBe("function");
+  });
+
+  it("should have a updateProduct.findByIdAndUpdate function", async () => {
+    req.params.productId = productId;
+    req.body = updatedProduct;
+    await productController.updateProduct(req, res, next);
+    expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      productId,
+      updatedProduct,
+      { new: true }
+    );
+  });
+
+  it("should return json body and response code 200", async () => {
+    req.params.productId = productId;
+    req.body = updatedProduct;
+    productModel.findByIdAndUpdate.mockReturnValue(updatedProduct);
+    await productController.updateProduct(req, res, next);
+    expect(res.statusCode).toBe(200);
+    expect(res._isEndCalled()).toBeTruthy();
+    expect(res._getJSONData()).toStrictEqual(updatedProduct);
+  });
+  it("should return 404 if id not exis", async () => {
+    productModel.findByIdAndUpdate.mockReturnValue(null);
+    await productController.updateProduct(req, res, next);
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+
+  it("should handle error", async () => {
+    const errorMessage = { message: "error finding id" };
+    const rejectedPromise = Promise.reject(errorMessage);
+    productModel.findByIdAndUpdate.mockReturnValue(rejectedPromise);
+    await productController.updateProduct(req, res, next);
+    expect(next).toHaveBeenCalledWith(errorMessage);
+  });
+});
