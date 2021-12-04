@@ -58,3 +58,17 @@ it("PUT id dose not exist /api/products", async () => {
     .send({ name: "updated name", description: "updated description" });
   expect(response.statusCode).toBe(404);
 });
+
+it("DELETE /api/products", async () => {
+  const response = await request(app)
+    .delete("/api/products/" + firstProduct._id)
+    .send();
+  expect(response.statusCode).toBe(200);
+});
+
+it("DELETE id dose not exist /api/products", async () => {
+  const response = await request(app)
+    .delete("/api/products/" + firstProduct._id)
+    .send();
+  expect(response.statusCode).toBe(404);
+});

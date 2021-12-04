@@ -53,7 +53,6 @@ exports.deleteProduct = async (req, res, next) => {
     const deletedProduct = await productModel.findByIdAndDelete(
       req.params.productId
     );
-
     if (deletedProduct) {
       return res.status(200).json(deletedProduct);
     }
