@@ -41,12 +41,46 @@ describe("Product Controller Create", () => {
         expect(res._getJSONData()).toStrictEqual(newProduct)
     })
     it("should handle errors", async () => {
+        // 에러메시지를 만드는 부분
         const errorMessage = { message: "description property missing" };
         const rejectedPromise = Promise.reject(errorMessage);
+        
+        // 에러메시지를 받아서 처리하는 부분
         productModel.create.mockReturnValue(rejectedPromise);
+
+        // next는 에러를 처리하기 때문에 next에 expecter를 넣어준다.
         await productController.createProduct(req, res, next);
         expect(next).toBeCalledWith(errorMessage);
     })
 })
 
 
+describe("productController Get", () => {
+    it("should have a getProducts function", () => {
+        expect(typeof productController.getProducts).toBe("function")
+    })
+
+    it("should call ProductModel.find({})", async () => {
+        await productController.getProducts(req, res, next);
+        expect(productModel.find).toHaveBeenCalledWith({});
+    })
+
+    it("should return 200 statusCode ", async () => {
+        await productController.getProducts(req, res, next);
+        expect(res.statusCode).toBe(200);
+        expect(res._isEndCalled).toBeTruthy();
+    })
+    it("should return allProducts in json body ", async () => {
+        productModel.find.mockReturnValue(allProducts);
+        await productController.getProducts(req, res, next);
+        expect(res._getJSONData()).toStrictEqual(allProducts)
+    })
+    it("should handle errors", async () => {
+        const errorMessage = { message: "error finding product data" };
+        const rejectedPromise = Promise.reject(errorMessage);       
+        productModel.find.mockReturnValue(rejectedPromise);
+        await productController.getProducts(req, res, next);
+        expect(next).toBeCalledWith(errorMessage);
+    })
+
+})

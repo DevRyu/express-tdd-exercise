@@ -28,5 +28,8 @@ app.use((error, req, res, next) => {
 })
 app.listen(PORT);
 console.log(`Running on port ${PORT}`)
+app.use(async (error, req, res, next) => {
+    res.status(500).json({        message: error.message})
+});
 
 module.exports = app;
